@@ -3,19 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page</title>
+    <title>Event Hub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                        url('https://source.unsplash.com/random/1200x800/?event') no-repeat center center;
+            background-size: cover;
+            color: white;
+            padding: 8rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .event-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border: none;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .badge-custom {
+            font-size: 0.8rem;
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 50%;          /* Position at the middle */
+            transform: translateX(-50%);  /* Shift back by half its width */
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background: #0d6efd;
+        }
+
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Event Portal</h1>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Event Hub</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'postEvents' %}">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'eventRegistration' %}">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">Discover Amazing Events</h1>
+            <p class="lead mb-4">Find and join exciting events happening around you</p>
+            <a href="{% url 'postEvents' %}" class="btn btn-primary btn-lg px-4 me-sm-3">Browse Events</a>
+            <a href="{% url 'eventRegistration' %}" class="btn btn-outline-light btn-lg px-4">Register for Event</a>
+        </div>
     </header>
-    <main>
-        <p>This is a minimal testing landing page for the events app.</p>
-        <p>Dynamic Content: {{ dynamic_message }}</p>
-        <a href="/event-registration/">Register for an Event</a>
-    </main>
-    <footer>
-        <p>&copy; 2025 Event Portal</p>
+
+    <!-- Featured Events Section -->
+    <section class="container my-5">
+        <h2 class="section-title text-center">Featured Events</h2>
+        <div class="row g-4">
+            {% if events %}
+                {% for event in events|slice:":3" %}
+                <div class="col-md-4">
+                    <div class="card event-card shadow-sm">
+                        <img src="https://source.unsplash.com/random/600x400/?event,{{ forloop.counter }}" class="card-img-top" alt="{{ event.title }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary badge-custom">{{ event.date|date:"M d" }}</span>
+                                {% if event.is_full %}
+                                    <span class="badge bg-danger badge-custom">Full</span>
+                                {% else %}
+                                    <span class="badge bg-success badge-custom">Available</span>
+                                {% endif %}
+                            </div>
+                            <h5 class="card-title">{{ event.title }}</h5>
+                            <p class="card-text text-muted mb-2">
+                                <small><i class="bi bi-geo-alt"></i> {{ event.location }}</small>
+                            </p>
+                            <p class="card-text">{{ event.description|truncatewords:15 }}</p>
+                            <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">No events available at the moment.</p>
+                    <a href="{% url 'postEvents' %}" class="btn btn-primary">Create an Event</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="bg-light py-5 my-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-4">Why Choose Event Hub?</h2>
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    <div class="p-3">
+                        <div class="feature-icon bg-primary bg-opacity-10 p-3 rounded-circle mb-3 mx-auto" style="width:70px;height:70px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-calendar-check text-primary" viewBox="0 0 16 16">
+                                <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                        </div>
+                        <h4>Easy Scheduling</h4>
+                        <p class="text-muted">Find and schedule events with just a few clicks.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="p-3">
+                        <div class="feature-icon bg-primary bg-opacity-10 p-3 rounded-circle mb-3 mx-auto" style="width:70px;height:70px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-people text-primary" viewBox="0 0 16 16">
+                                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                            </svg>
+                        </div>
+                        <h4>Community Focused</h4>
+                        <p class="text-muted">Join a vibrant community of event enthusiasts.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="p-3">
+                        <div class="feature-icon bg-primary bg-opacity-10 p-3 rounded-circle mb-3 mx-auto" style="width:70px;height:70px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bell text-primary" viewBox="0 0 16 16">
+                                <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                            </svg>
+                        </div>
+                        <h4>Instant Notifications</h4>
+                        <p class="text-muted">Get updates about events you're interested in.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="container mb-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2>Ready to get started?</h2>
+                <p class="lead text-muted">Join thousands of people who use Event Hub to discover and join amazing events.</p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="{% url 'postEvents' %}" class="btn btn-primary btn-lg px-4">Create an Event</a>
+                    <a href="{% url 'eventRegistration' %}" class="btn btn-outline-secondary btn-lg px-4">Register Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Event Hub</h5>
+                    <p class="small">Connecting people through events since 2023</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="{% url 'postEvents' %}" class="text-white text-decoration-none">Events</a></li>
+                        <li><a href="{% url 'eventRegistration' %}" class="text-white text-decoration-none">Registration</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled small">
+                        <li>info@eventhub.com</li>
+                        <li>+1 (123) 456-7890</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center small">
+                <p class="mb-0">&copy; 2023 Event Hub. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
+
+    <!-- Bootstrap JS with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
