@@ -27,4 +27,5 @@ urlpatterns = [
     path('event-registration/', include('event_registration.urls')),
     path('accounts/logout/', LogoutView.as_view(next_page='/'), name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/sign-in', include())
 ]
