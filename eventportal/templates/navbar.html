@@ -21,9 +21,7 @@
       </ul>
       <ul class="navbar-nav">
         {% if user.is_authenticated %}
-        <li class="nav-item">
-          <span class="nav-link">Hello, {{ user.username }}</span>
-        </li>
+       
         <<!-- templates/navbar.html -->
         <li class="nav-item">
           <form
@@ -36,6 +34,7 @@
               type="submit"
               class="btn btn-link nav-link"
               style="background: none; border: none; padding: 0"
+              href="{% url 'logout' %}"
             >
               Logout
             </button>
