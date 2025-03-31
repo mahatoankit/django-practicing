@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Event
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 
 # Create your views here.
@@ -16,7 +18,7 @@ def eventLandingPage(request):
     else:
         return render(request, "events/index.html")
 
-
+@login_required
 def postEvents(request):
     if request.method == "POST":
         title = request.POST.get("title")
@@ -52,12 +54,14 @@ def postEvents(request):
 #         return redirect('postEvents')
 #     return render(request, 'events/deleteEvent.html', {'event': event})
 
-
+@login_required
 def delete_event(request, eventID):
     event = Event.objects.get(id=eventID)
     event.delete()
     return redirect('postEvents')
 
+
+@login_required
 def editEventDetail(request, eventId):
     event = Event.objects.get(id = eventId)
     if request.method == 'POST':
@@ -77,3 +81,6 @@ def editEventDetail(request, eventId):
 
     return render(request, 'events/editEvents.html', {'event': event})
 
+def logout_view(request):
+    logout(request)
+    return redirect('eventlandingPage')

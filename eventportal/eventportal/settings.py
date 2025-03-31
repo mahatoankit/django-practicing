@@ -72,6 +72,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'eventportal.wsgi.application'
 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -125,3 +128,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# Add this to settings.py
+LOGOUT_REDIRECT_URL = '/'  # Redirect to homepage after logout
+CSRF_COOKIE_SECURE = False  # Only if testing locally
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
