@@ -38,3 +38,15 @@ def loginView(request):
 def logoutView(request):
     logout(request)
     return redirect('login')
+
+def signUpView(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('eventlandingPage')
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'accounts/signup.html', {'form':form})

@@ -1,0 +1,46 @@
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url("/static/events/images/1.jpg") no-repeat center center;
+    background-size: cover;
+    color: white;
+    padding: 8rem 0;
+    margin-bottom: 2rem;
+}
+
+
+.event-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    border: none;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+    height: 180px;
+    object-fit: cover;
+}
+
+.badge-custom {
+    font-size: 0.8rem;
+}
+
+.section-title {
+    position: relative;
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 50%;          /* Position at the middle */
+    transform: translateX(-50%);  /* Shift back by half its width */
+    bottom: 0;
+    width: 50px;
+    height: 3px;
+    background: #0d6efd;
+}
