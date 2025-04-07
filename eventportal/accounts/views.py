@@ -35,9 +35,10 @@ def loginView(request):
 
 
 
-def logoutView(request):
+def logout_view(request):
+    """Custom logout view that always returns a redirect."""
     logout(request)
-    return redirect('login')
+    return redirect('eventlandingPage') 
 
 def signUpView(request):
     if request.method == 'POST':
