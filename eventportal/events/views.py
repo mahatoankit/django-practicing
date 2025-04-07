@@ -1,14 +1,50 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Event
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
+from datetime import datetime
+
+# Add these imports for DRF
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import EventSerializer
 
 
+# Fix the permission class name here
+class EventViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows events to be viewed or edited.
+    """
 
-# Create your views here.
+    queryset = Event.objects.all().order_by("-created_at")
+    serializer_class = EventSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]  # Fix this line
+
+
+@api_view(["GET"])
+def api_event_list(request):
+    """API endpoint to get all events"""
+    events = Event.objects.all().order_by("-created_at")
+    serializer = EventSerializer(events, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def api_event_detail(request, pk):
+    """API endpoint to get a specific event"""
+    try:
+        event = Event.objects.get(pk=pk)
+    except Event.DoesNotExist:
+        return Response(status=404)
+
+    serializer = EventSerializer(event)
+    return Response(serializer.data)
+
+
 def events(request):
     return HttpResponse("<h1>This is event section</h1>")
 
@@ -19,6 +55,7 @@ def eventLandingPage(request):
         return HttpResponse(f"Thank you {name} for registering")
     else:
         return render(request, "events/index.html")
+
 
 @login_required
 def postEvents(request):
@@ -49,6 +86,7 @@ def postEvents(request):
     events = Event.objects.all().order_by("-created_at")
     return render(request, "events/postEvents.html", {"events": events})
 
+
 # def delete_event(request, event_id):
 #     event = Event.objects.get(id = event_id)
 #     if request.method == 'POST':
@@ -56,17 +94,18 @@ def postEvents(request):
 #         return redirect('postEvents')
 #     return render(request, 'events/deleteEvent.html', {'event': event})
 
+
 @login_required
 def delete_event(request, eventID):
     event = Event.objects.get(id=eventID)
     event.delete()
-    return redirect('postEvents')
+    return redirect("postEvents")
 
 
 @login_required
 def editEventDetail(request, eventId):
-    event = Event.objects.get(id = eventId)
-    if request.method == 'POST':
+    event = Event.objects.get(id=eventId)
+    if request.method == "POST":
         title = request.POST.get("title")
         date_str = request.POST.get("date")
         location = request.POST.get("location")
@@ -74,15 +113,18 @@ def editEventDetail(request, eventId):
         capacity = request.POST.get("capacity")
 
         event.title = title
-        event.location = location 
+        event.location = location
         event.description = description
         event.capacity = capacity
         event.save()
 
-        return redirect('postEvents')
+        return redirect("postEvents")
 
-    return render(request, 'events/editEvents.html', {'event': event})
+    return render(request, "events/editEvents.html", {"event": event})
+
+
+from django.contrib.auth import logout as auth_logout
 
 def logout_view(request):
-    logout(request)
+    auth_logout(request)  # Use the renamed function
     return redirect('eventlandingPage')
