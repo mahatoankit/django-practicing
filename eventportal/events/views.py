@@ -61,29 +61,24 @@ def eventLandingPage(request):
 def postEvents(request):
     if request.method == "POST":
         title = request.POST.get("title")
-        date_str = request.POST.get("date")
-        location = request.POST.get("location")
         description = request.POST.get("description")
+        date = request.POST.get("date")
+        location = request.POST.get("location")
         capacity = request.POST.get("capacity")
-        try:
 
-            date = timezone.datetime.fromisoformat(date_str)
-            if timezone.is_naive(date):
-                date = timezone.make_aware(date)
-        except (ValueError, TypeError):
-            date = timezone.now()
-
-        Event.objects.create(
+        event = Event(
             title=title,
+            description=description,
             date=date,
             location=location,
-            description=description,
-            capacity=int(capacity),  # Convert to integer
+            capacity=capacity,
+            created_by=request.user  # Set the current user as creator
         )
-        return redirect("postEvents")  # Redirect after POST
+        event.save()
+        messages.success(request, "Event created successfully!")
+        return redirect("postEvents")
 
-    # For both GET and after redirect from POST
-    events = Event.objects.all().order_by("-created_at")
+    events = Event.objects.all().order_by('-created_at')
     return render(request, "events/postEvents.html", {"events": events})
 
 
@@ -97,25 +92,36 @@ def postEvents(request):
 
 @login_required
 def delete_event(request, eventID):
-    event = Event.objects.get(id=eventID)
-    event.delete()
-    return redirect("postEvents")
+    event = get_object_or_404(Event, id=eventID)
+    
+    # Check if user is authorized to delete this event
+    if not event.can_edit(request.user):
+        messages.error(request, "You don't have permission to delete this event.")
+        return redirect("postEvents")
+    
+    if request.method == "POST":
+        event.delete()
+        return redirect("postEvents")
+    
+    return render(request, "events/delete_confirm.html", {"event": event})
 
 
 @login_required
 def editEventDetail(request, eventId):
-    event = Event.objects.get(id=eventId)
+    event = get_object_or_404(Event, id=eventId)
+    
+    # Check if user is authorized to edit this event
+    if not event.can_edit(request.user):
+        messages.error(request, "You don't have permission to edit this event.")
+        return redirect("postEvents")
+    
     if request.method == "POST":
-        title = request.POST.get("title")
-        date_str = request.POST.get("date")
-        location = request.POST.get("location")
-        description = request.POST.get("description")
-        capacity = request.POST.get("capacity")
-
-        event.title = title
-        event.location = location
-        event.description = description
-        event.capacity = capacity
+        # Process form submission
+        event.title = request.POST.get("title")
+        event.description = request.POST.get("description")
+        event.date = request.POST.get("date")
+        event.location = request.POST.get("location")
+        event.capacity = request.POST.get("capacity")
         event.save()
 
         return redirect("postEvents")
