@@ -13,6 +13,16 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-    
+
+    @property
+    def spots_left(self):
+        """Returns the number of spots left for registration"""
+        from event_registration.models import Registration
+
+        registered = Registration.objects.filter(event=self).count()
+        return max(0, self.capacity - registered)
+
+    @property
     def is_full(self):
-        return self.capacity <= self.registration_set.count() >= self.capacity
+        """Returns True if the event is full"""
+        return self.spots_left == 0
