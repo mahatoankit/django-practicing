@@ -3,10 +3,7 @@ services:
     name: eventportal
     env: python
     buildCommand: pip install -r eventportal/requirements.txt && python eventportal/manage.py collectstatic --noinput
-    startCommand: gunicorn eventportal.wsgi:application  # This line is correct
-    # You may also need to adjust the command to run the server if you want to use it directly
-    # For example, if you want to run the development server (not recommended for production):
-    # startCommand: python eventportal/manage.py runserver 0.0.0.0:8000
+    startCommand: gunicorn eventportal.wsgi:application
     envVars:
       - key: ENVIRONMENT
         value: production
